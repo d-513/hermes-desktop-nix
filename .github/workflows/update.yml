@@ -1,0 +1,30 @@
+name: update
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: hermes-desktop-update
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - run: ./update.sh
+      - name: Commit pin if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- flake.nix flake.lock; then
+            echo "already up to date"
+            exit 0
+          fi
+          nix build
+          tag="$(sed -n 's|^[[:space:]]*url = "github:NousResearch/hermes-agent/\(.*\)";$|\1|p' flake.nix | head -n1)"
+          git add flake.nix flake.lock
+          git commit -m "hermes-desktop: ${tag}"
+          git push
