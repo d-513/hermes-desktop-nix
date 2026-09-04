@@ -4,6 +4,7 @@
   callPackage,
   makeShellWrapper,
   writeText,
+  imagemagick,
   electron,
   xdg-utils,
   addDriverRunpath,
@@ -101,7 +102,7 @@ let
     Name=Hermes
     Comment=Desktop client for a remote Hermes Agent server
     Exec=@out@/bin/hermes-desktop %U
-    Icon=hermes
+    Icon=@out@/share/icons/hicolor/512x512/apps/hermes.png
     StartupWMClass=Hermes
     Categories=Development;Utility;
     MimeType=x-scheme-handler/hermes;
@@ -116,7 +117,10 @@ stdenv.mkDerivation {
   dontPatchELF = true;
   dontStrip = true;
 
-  nativeBuildInputs = [ makeShellWrapper ];
+  nativeBuildInputs = [
+    makeShellWrapper
+    imagemagick
+  ];
 
   installPhase = ''
     runHook preInstall
@@ -127,8 +131,12 @@ stdenv.mkDerivation {
     substituteInPlace $out/share/hermes-desktop/dist/electron-main.mjs \
       --replace-fail "process.resourcesPath" "'$out/share/hermes-desktop'"
 
-    install -Dm644 ${hermes-src}/apps/desktop/assets/icon.png \
-      $out/share/icons/hicolor/1024x1024/apps/hermes.png
+    # hicolor has no 1024x1024 slot; menus look in 48/256/512 and ignore 1024.
+    for size in 48 256 512; do
+      mkdir -p $out/share/icons/hicolor/''${size}x''${size}/apps
+      ${lib.getExe' imagemagick "magick"} ${hermes-src}/apps/desktop/assets/icon.png -resize ''${size}x''${size} \
+        $out/share/icons/hicolor/''${size}x''${size}/apps/hermes.png
+    done
 
     substitute ${desktopFile} $out/share/applications/hermes.desktop \
       --subst-var-by out "$out"

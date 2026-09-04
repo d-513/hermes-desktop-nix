@@ -35,6 +35,7 @@ and pushes when `releases/latest` moves.
 - `makeShellWrapper` so `${NIXOS_OZONE_WL:+…}` expands at launch.
 - node-pty is rebuilt against `electron.headers` (same ABI as nixpkgs `electron`).
 - `process.resourcesPath` is patched to `$out/share/hermes-desktop`.
+- Desktop `Icon=` is an absolute 512px path. Do not install only `hicolor/1024x1024` — that size is not in the spec, so app menus show a generic icon.
 - In-app updater cannot write to the Nix store; bump via `./update.sh`.
 
 ## Do not
