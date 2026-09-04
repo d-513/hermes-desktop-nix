@@ -76,23 +76,6 @@ Same flake input, then:
 }
 ```
 
-### Profile
-
-```sh
-nix profile install github:d-513/hermes-desktop-nix
-```
-
-## Remote server
-
-On the host that should run the agent (not this flake):
-
-```sh
-hermes serve --host 0.0.0.0 --port 9119
-```
-
-Use whatever bind/auth your network needs (Tailscale, OAuth, a pinned session
-token). Desktop talks to that process; it does not start it.
-
 ## Wayland
 
 ```nix
@@ -108,21 +91,10 @@ The in-app updater cannot write into the Nix store. This flake pins a
 `.github/workflows/update.yml` runs `./update.sh` every six hours and pushes
 when a new release appears.
 
-On your machine:
-
-```sh
-./update.sh                 # latest non-prerelease
-./update.sh v2026.8.31      # pin a specific tag
-nix flake update hermes-desktop-nix
-```
-
-then rebuild. `nix flake update` without an attribute also updates nixpkgs.
-`nix flake update hermes-agent` only re-fetches the already-pinned tag.
-
 ## Why not the official flake?
 
-| | `hermes-agent#desktop` | this flake |
-| --- | --- | --- |
-| Builds | Electron UI + Python agent (uv2nix) | Electron UI only |
-| Default backend | local Nix-wrapped `hermes` | remote gateway / first-launch connect UI |
-| Closure | agent + skills + runtime tools | electron + renderer |
+|                 | `hermes-agent#desktop`              | this flake                               |
+| --------------- | ----------------------------------- | ---------------------------------------- |
+| Builds          | Electron UI + Python agent (uv2nix) | Electron UI only                         |
+| Default backend | local Nix-wrapped `hermes`          | remote gateway / first-launch connect UI |
+| Closure         | agent + skills + runtime tools      | electron + renderer                      |
