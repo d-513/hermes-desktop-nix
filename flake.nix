@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     # Release tag, not main. flake = false so we don't evaluate uv2nix / the agent.
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent/v2026.9.7";
+      url = "github:NousResearch/hermes-agent/v2026.9.11";
       flake = false;
     };
     npm-lockfile-fix = {
